@@ -2,24 +2,46 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { prompt, system, model = 'flux' } = await req.json();
+    const { 
+      prompt, 
+      system = 'pokemon', 
+      stylePreset = 'official_tcg',
+      model = 'flux',
+      aspect = 'portrait' // 'portrait' | 'square'
+    } = await req.json();
 
     if (!prompt) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    // 1. 構建高質量 TCG 動漫風格 Prompt
-    let enhancedPrompt = `masterpiece, best quality, ultra detailed anime card artwork, dynamic battle pose, vibrant cel shading, cinematic lighting, 8k resolution, ${prompt}`;
-    
-    if (system === 'pokemon') {
-      enhancedPrompt += ', official pokemon card game illustration style, energy particles, full bleed action';
-    } else if (system === 'onepiece') {
-      enhancedPrompt += ', official one piece tcg manga style, high impact speed lines, bold vivid colors';
-    } else if (system === 'yugioh') {
-      enhancedPrompt += ', yu-gi-oh ocg card illustration style, intricate fantasy summoning magic';
+    // 1. Determine style keywords based on preset & system
+    let styleKeywords = 'masterpiece, best quality, ultra-detailed 2D anime card illustration, sharp clean linework, vibrant cel-shading, dynamic lighting, 8k resolution';
+
+    if (stylePreset === 'cel_shaded_90s') {
+      styleKeywords += ', 90s vintage anime aesthetic, classic Ken Sugimori watercolor vibe, retro anime cel shading';
+    } else if (stylePreset === 'manga_ink') {
+      styleKeywords += ', Japanese manga ink color spread, bold dynamic brush lines, Eiichiro Oda art style, high impact speedlines';
+    } else if (stylePreset === 'dark_fantasy') {
+      styleKeywords += ', dark fantasy gothic anime, Kazuki Takahashi Yu-Gi-Oh card style, glowing magic circles, high contrast dramatic lighting';
+    } else if (stylePreset === 'gold_etched') {
+      styleKeywords += ', gold etched holographic foil background, shiny metallic reflections, luxurious trading card secret rare style';
+    } else {
+      // official_tcg default
+      if (system === 'pokemon') {
+        styleKeywords += ', official Pokémon TCG Special Art Rare illustration, radiant elemental aura particles, vibrant saturated colors, full bleed dynamic composition';
+      } else if (system === 'onepiece') {
+        styleKeywords += ', official One Piece TCG Manga Alternate Art, explosive action pose, bold vivid colors, cinematic depth of field';
+      } else if (system === 'yugioh') {
+        styleKeywords += ', official Yu-Gi-Oh OCG card artwork, intricate summoning magic seal, sharp cel-shaded anime fantasy monster art';
+      }
     }
 
-    // 2. 方案 A：使用 Hugging Face 免費 Token (若有設定環境變數)
+    const enhancedPrompt = `${prompt}, ${styleKeywords}, high resolution illustration, centered character, no text overlay, no watermarks`;
+
+    const width = aspect === 'square' ? 768 : 768;
+    const height = aspect === 'square' ? 768 : 1024;
+
+    // 2. Option A: Hugging Face API if key is present
     const hfToken = process.env.HUGGINGFACE_API_KEY;
     if (hfToken) {
       try {
@@ -32,7 +54,7 @@ export async function POST(req: Request) {
           method: 'POST',
           body: JSON.stringify({
             inputs: enhancedPrompt,
-            parameters: { width: 768, height: 768 }
+            parameters: { width, height }
           }),
         });
 
@@ -42,6 +64,7 @@ export async function POST(req: Request) {
           return NextResponse.json({
             imageUrl: `data:image/jpeg;base64,${base64}`,
             provider: 'huggingface',
+            prompt: enhancedPrompt,
           });
         }
       } catch (hfErr) {
@@ -49,14 +72,15 @@ export async function POST(req: Request) {
       }
     }
 
-    // 3. 方案 B：使用 100% 免費、免 API Key 的 Pollinations.ai (FLUX 引擎)
+    // 3. Option B: Pollinations.ai (FLUX engine) with seed & width/height
     const seed = Math.floor(Math.random() * 9999999);
     const encoded = encodeURIComponent(enhancedPrompt);
-    const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=768&height=768&seed=${seed}&model=${model}&nologo=true`;
+    const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=${width}&height=${height}&seed=${seed}&model=${model}&nologo=true`;
 
     return NextResponse.json({
       imageUrl,
       provider: 'pollinations',
+      prompt: enhancedPrompt,
     });
   } catch (err: any) {
     console.error('Image generation error:', err);

@@ -1,20 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Bebas+Neue&family=Orbitron:wght@700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Montserrat:wght@600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Bebas+Neue&family=Orbitron:wght@700;900&display=swap');
+:root {
+  --font-cinzel: 'Cinzel', serif;
+  --font-bebas: 'Bebas Neue', cursive, sans-serif;
+  --font-orbitron: 'Orbitron', sans-serif;
+  --font-zen: 'Zen Kaku Gothic New', sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
+}
 
 body {
-  background-color: #070b14;
+  background-color: #050811;
   color: #e2e8f0;
+  font-family: var(--font-zen), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
 
-.holo-overlay {
-  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.35) 30%, rgba(236, 72, 153, 0.25) 45%, rgba(59, 130, 246, 0.25) 55%, transparent 70%);
-  mix-blend-mode: color-dodge;
-  pointer-events: none;
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
 
-.font-cinzel { font-family: 'Cinzel', serif; }
-.font-bebas { font-family: 'Bebas Neue', cursive, sans-serif; }
-.font-orbitron { font-family: 'Orbitron', sans-serif; }
+.font-cinzel { font-family: var(--font-cinzel); }
+.font-bebas { font-family: var(--font-bebas); }
+.font-orbitron { font-family: var(--font-orbitron); }
+.font-zen { font-family: var(--font-zen); }
+.font-montserrat { font-family: var(--font-montserrat); }
+
+/* Foil & holographic effects */
+@keyframes holoShimmer {
+  0% { transform: translateY(-100%) rotate(25deg); }
+  100% { transform: translateY(200%) rotate(25deg); }
+}
+
+.holo-sweep {
+  animation: holoShimmer 6s infinite linear;
+}
+
+.gold-foil-text {
+  background: linear-gradient(135deg, #fef08a 0%, #eab308 30%, #fef9c3 50%, #ca8a04 70%, #fef08a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+}
+
+.silver-foil-text {
+  background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 35%, #ffffff 50%, #94a3b8 70%, #f8fafc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+}
