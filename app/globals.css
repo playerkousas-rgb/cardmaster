@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Bebas+Neue&family=Orbitron:wght@700;900&display=swap');
+
+body {
+  background-color: #070b14;
+  color: #e2e8f0;
+}
+
+.holo-overlay {
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.35) 30%, rgba(236, 72, 153, 0.25) 45%, rgba(59, 130, 246, 0.25) 55%, transparent 70%);
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+}
+
+.font-cinzel { font-family: 'Cinzel', serif; }
+.font-bebas { font-family: 'Bebas Neue', cursive, sans-serif; }
+.font-orbitron { font-family: 'Orbitron', sans-serif; }
